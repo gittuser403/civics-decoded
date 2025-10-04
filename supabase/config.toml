@@ -8,3 +8,15 @@ verify_jwt = false
 
 [functions.generate-arguments]
 verify_jwt = false
+
+[functions.sync-congress-bills]
+verify_jwt = false
+
+[functions.sync-govtrack-bills]
+verify_jwt = false
+
+[functions.sync-openstates-bills]
+verify_jwt = false
+
+[functions.sync-legislative-data]
+verify_jwt = false

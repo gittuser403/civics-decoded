@@ -20,51 +20,105 @@ export type Database = {
           arguments: Json | null
           bill_number: string
           category: string
+          committees: Json | null
+          cosponsors: Json | null
           cost_estimate: string | null
           created_at: string
+          external_id: string | null
           full_text: string
           id: string
           impact_data: Json | null
           introduced_date: string
+          last_synced: string | null
+          official_url: string | null
           short_description: string
+          source: string | null
           sponsor: string | null
           stages: Json | null
           status: string
           title: string
+          votes: Json | null
         }
         Insert: {
           affected_population?: string | null
           arguments?: Json | null
           bill_number: string
           category: string
+          committees?: Json | null
+          cosponsors?: Json | null
           cost_estimate?: string | null
           created_at?: string
+          external_id?: string | null
           full_text: string
           id?: string
           impact_data?: Json | null
           introduced_date: string
+          last_synced?: string | null
+          official_url?: string | null
           short_description: string
+          source?: string | null
           sponsor?: string | null
           stages?: Json | null
           status: string
           title: string
+          votes?: Json | null
         }
         Update: {
           affected_population?: string | null
           arguments?: Json | null
           bill_number?: string
           category?: string
+          committees?: Json | null
+          cosponsors?: Json | null
           cost_estimate?: string | null
           created_at?: string
+          external_id?: string | null
           full_text?: string
           id?: string
           impact_data?: Json | null
           introduced_date?: string
+          last_synced?: string | null
+          official_url?: string | null
           short_description?: string
+          source?: string | null
           sponsor?: string | null
           stages?: Json | null
           status?: string
           title?: string
+          votes?: Json | null
+        }
+        Relationships: []
+      }
+      sync_log: {
+        Row: {
+          bills_synced: number | null
+          completed_at: string | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          source: string
+          started_at: string | null
+          status: string
+        }
+        Insert: {
+          bills_synced?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          source: string
+          started_at?: string | null
+          status: string
+        }
+        Update: {
+          bills_synced?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          source?: string
+          started_at?: string | null
+          status?: string
         }
         Relationships: []
       }
