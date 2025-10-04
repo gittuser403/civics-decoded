@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.summarize-bill]
 verify_jwt = false
+
+[functions.generate-arguments]
+verify_jwt = false
