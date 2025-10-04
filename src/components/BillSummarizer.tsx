@@ -3,12 +3,30 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Loader2, GraduationCap, BookOpen } from "lucide-react";
+import { Sparkles, Loader2, GraduationCap, BookOpen, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 type ReadingLevel = "middle" | "high";
 
-export const BillSummarizer = () => {
+type Bill = {
+  id: string;
+  bill_number: string;
+  title: string;
+  short_description: string;
+  full_text: string;
+  status: string;
+  introduced_date: string;
+  category: string;
+  sponsor: string | null;
+};
+
+type BillSummarizerProps = {
+  selectedBill?: Bill | null;
+  onClearBill?: () => void;
+};
+
+export const BillSummarizer = ({ selectedBill, onClearBill }: BillSummarizerProps) => {
   const [billText, setBillText] = useState("");
   const [summary, setSummary] = useState("");
   const [loading, setLoading] = useState(false);
@@ -16,10 +34,12 @@ export const BillSummarizer = () => {
   const { toast } = useToast();
 
   const handleSummarize = async () => {
-    if (!billText.trim()) {
+    const textToSummarize = selectedBill ? selectedBill.full_text : billText;
+    
+    if (!textToSummarize.trim()) {
       toast({
         title: "Missing input",
-        description: "Please paste some bill text or a link to analyze",
+        description: "Please paste some bill text or select a bill from the list",
         variant: "destructive",
       });
       return;
@@ -27,27 +47,28 @@ export const BillSummarizer = () => {
 
     setLoading(true);
     
-    // Simulate AI processing - in production, this would call Lovable AI
-    setTimeout(() => {
-      const levelText = readingLevel === "middle" ? "middle school" : "high school";
-      setSummary(
-        `📜 **Bill Summary** (${levelText} level)\n\n` +
-        `🎯 **Main Goal:** This bill aims to [main purpose]\n\n` +
-        `💰 **Budget Impact:** $X million over Y years\n\n` +
-        `👥 **Who It Affects:** Students, families, educators\n\n` +
-        `⏰ **Timeline:** If passed, changes would start in [date]\n\n` +
-        `✅ **Key Points:**\n` +
-        `• Point 1: Simplified explanation\n` +
-        `• Point 2: Another key detail\n` +
-        `• Point 3: Important change\n\n` +
-        `📊 **Current Status:** Under committee review`
-      );
-      setLoading(false);
+    try {
+      const { data, error } = await supabase.functions.invoke('summarize-bill', {
+        body: { billText: textToSummarize, readingLevel }
+      });
+
+      if (error) throw error;
+
+      setSummary(data.summary);
       toast({
         title: "Summary generated!",
         description: "Your bill summary is ready",
       });
-    }, 2000);
+    } catch (error) {
+      console.error('Error summarizing bill:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate summary. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -58,7 +79,7 @@ export const BillSummarizer = () => {
           Bill Summarizer
         </CardTitle>
         <CardDescription>
-          Paste a bill link or text to get a plain English summary
+          {selectedBill ? "Generate a summary for the selected bill" : "Paste a bill link or text to get a plain English summary"}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -83,12 +104,33 @@ export const BillSummarizer = () => {
           </Button>
         </div>
 
-        <Textarea
-          placeholder="Paste bill text or link here... (e.g., congress.gov/bill/...)"
-          value={billText}
-          onChange={(e) => setBillText(e.target.value)}
-          className="min-h-[120px]"
-        />
+        {selectedBill ? (
+          <div className="rounded-lg border bg-primary-light p-4">
+            <div className="flex items-start justify-between mb-2">
+              <div>
+                <Badge variant="outline" className="mb-2">{selectedBill.bill_number}</Badge>
+                <h4 className="font-semibold">{selectedBill.title}</h4>
+              </div>
+              {onClearBill && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onClearBill}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground">{selectedBill.short_description}</p>
+          </div>
+        ) : (
+          <Textarea
+            placeholder="Paste bill text or link here... (e.g., congress.gov/bill/...)"
+            value={billText}
+            onChange={(e) => setBillText(e.target.value)}
+            className="min-h-[120px]"
+          />
+        )}
 
         <Button 
           onClick={handleSummarize} 

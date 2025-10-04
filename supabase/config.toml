@@ -1,1 +1,7 @@
 project_id = "nxrfefajarnzctdjbbrb"
+
+[functions.lookup-representative]
+verify_jwt = false
+
+[functions.summarize-bill]
+verify_jwt = false

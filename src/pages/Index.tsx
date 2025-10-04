@@ -1,10 +1,26 @@
+import { useState } from "react";
 import { Header } from "@/components/Header";
 import { BillSummarizer } from "@/components/BillSummarizer";
 import { ArgumentCards } from "@/components/ArgumentCards";
 import { BillTracker } from "@/components/BillTracker";
 import { ContactRep } from "@/components/ContactRep";
+import { BillsList } from "@/components/BillsList";
+
+type Bill = {
+  id: string;
+  bill_number: string;
+  title: string;
+  short_description: string;
+  full_text: string;
+  status: string;
+  introduced_date: string;
+  category: string;
+  sponsor: string | null;
+};
 
 const Index = () => {
+  const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -27,13 +43,23 @@ const Index = () => {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid gap-8 lg:grid-cols-2 mb-8">
-          <div className="space-y-8">
-            <BillSummarizer />
+        <div className="grid gap-8 lg:grid-cols-3 mb-8">
+          {/* Left Column - Bills List */}
+          <div className="lg:col-span-1">
+            <BillsList onSelectBill={setSelectedBill} />
+          </div>
+
+          {/* Middle Column - Summarizer & Arguments */}
+          <div className="lg:col-span-1 space-y-8">
+            <BillSummarizer 
+              selectedBill={selectedBill} 
+              onClearBill={() => setSelectedBill(null)}
+            />
             <ArgumentCards />
           </div>
           
-          <div className="space-y-8">
+          {/* Right Column - Tracker & Contact */}
+          <div className="lg:col-span-1 space-y-8">
             <BillTracker />
             <ContactRep />
           </div>
