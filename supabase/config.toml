@@ -20,3 +20,9 @@ verify_jwt = false
 
 [functions.sync-legislative-data]
 verify_jwt = false
+
+[functions.generate-bill-stages]
+verify_jwt = false
+
+[functions.analyze-bill-impact]
+verify_jwt = false
