@@ -23,83 +23,78 @@ serve(async (req) => {
 
     console.log('Looking up representative for ZIP code:', zipCode);
 
-    // Use Google Civic Information API for accurate representative lookup
-    const GOOGLE_CIVIC_API_KEY = Deno.env.get('GOOGLE_CIVIC_API_KEY');
-    if (!GOOGLE_CIVIC_API_KEY) {
-      throw new Error('GOOGLE_CIVIC_API_KEY is not configured');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    const civicUrl = new URL('https://civicinfo.googleapis.com/civicinfo/v2/representatives');
-    civicUrl.searchParams.set('address', zipCode);
-    civicUrl.searchParams.set('levels', 'country');
-    civicUrl.searchParams.set('roles', 'legislatorLowerBody'); // U.S. House of Representatives
-    civicUrl.searchParams.set('key', GOOGLE_CIVIC_API_KEY);
+    // Use AI with tool calling for structured, accurate representative lookup
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a helpful assistant that provides accurate, up-to-date information about U.S. Congressional representatives. Use your knowledge to find the correct representative for the given ZIP code.'
+          },
+          {
+            role: 'user',
+            content: `Look up the current U.S. House Representative for ZIP code ${zipCode}. I need accurate information including their full name, political party, congressional district (format: STATE-##), official contact email or website contact page, phone number, and official website.`
+          }
+        ],
+        tools: [
+          {
+            type: "function",
+            function: {
+              name: "return_representative",
+              description: "Return the representative information for a ZIP code",
+              parameters: {
+                type: "object",
+                properties: {
+                  name: { type: "string", description: "Full name of the representative" },
+                  party: { type: "string", description: "Political party (e.g., Democratic, Republican)" },
+                  district: { type: "string", description: "Congressional district in format STATE-## (e.g., MA-02)" },
+                  email: { type: "string", description: "Official contact email or contact page URL" },
+                  phone: { type: "string", description: "Official phone number" },
+                  website: { type: "string", description: "Official website URL" }
+                },
+                required: ["name", "party", "district", "email", "phone", "website"],
+                additionalProperties: false
+              }
+            }
+          }
+        ],
+        tool_choice: { type: "function", function: { name: "return_representative" } }
+      }),
+    });
 
-    const civicResp = await fetch(civicUrl.toString());
-    if (!civicResp.ok) {
-      const errorText = await civicResp.text();
-      console.error('Civic API error:', civicResp.status, errorText);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('AI gateway error:', response.status, errorText);
       return new Response(
-        JSON.stringify({ error: 'Failed to lookup representative information (Civic API error).' }),
-        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'Failed to lookup representative information' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const civicData = await civicResp.json();
+    const data = await response.json();
+    console.log('AI Response:', JSON.stringify(data, null, 2));
 
-    const offices = civicData.offices ?? [];
-    const officials = civicData.officials ?? [];
-
-    if (!officials.length) {
-      console.warn('No officials found for ZIP:', zipCode, civicData);
+    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
+    if (!toolCall?.function?.arguments) {
+      console.error('No tool call in response');
       return new Response(
-        JSON.stringify({ error: 'No representative found for this ZIP code.' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'Failed to parse representative information' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Prefer the official linked from an office that matches legislatorLowerBody
-    let officialIndex = 0;
-    let divisionId: string | undefined;
-    for (const office of offices) {
-      if (Array.isArray(office.officialIndices)) {
-        const idx = office.officialIndices.find((i: number) => officials[i]);
-        if (idx !== undefined) {
-          officialIndex = idx;
-          divisionId = office.divisionId;
-          break;
-        }
-      }
-    }
-
-    const official = officials[officialIndex];
-
-    // Derive district like "MA-02" from divisionId (e.g. ocd-division/country:us/state:ma/cd:2)
-    let district = `ZIP ${zipCode}`;
-    try {
-      const div = divisionId || (offices[0]?.divisionId as string | undefined);
-      if (div) {
-        const stateMatch = div.match(/state:([a-z]{2})/i);
-        const cdMatch = div.match(/cd:(\d{1,2})/i);
-        if (stateMatch && cdMatch) {
-          const state = stateMatch[1].toUpperCase();
-          const cd = cdMatch[1].padStart(2, '0');
-          district = `${state}-${cd}`;
-        }
-      }
-    } catch (_) {
-      // keep default district
-    }
-
-    const repInfo = {
-      name: official.name || 'Unknown',
-      party: (official.party || 'Unknown').replace(' Party', ''),
-      district,
-      email: official.emails?.[0] || 'contact@house.gov',
-      phone: official.phones?.[0] || '(202) 225-3121',
-      website: official.urls?.[0] || 'https://www.house.gov',
-    };
-
+    const repInfo = JSON.parse(toolCall.function.arguments);
     console.log('Resolved Representative:', repInfo);
 
 
