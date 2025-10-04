@@ -1,53 +1,60 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, ThumbsUp, ThumbsDown } from "lucide-react";
 
 type Argument = {
-  id: number;
   side: "for" | "against";
   text: string;
   source: string;
 };
 
-const sampleArguments: Argument[] = [
-  {
-    id: 1,
-    side: "for",
-    text: "Increases funding for public education by 15%, helping schools hire more teachers and reduce class sizes.",
-    source: "Department of Education Analysis",
-  },
-  {
-    id: 2,
-    side: "against",
-    text: "May lead to higher taxes for middle-class families to cover the $2 billion annual cost.",
-    source: "Congressional Budget Office",
-  },
-  {
-    id: 3,
-    side: "for",
-    text: "Provides resources for after-school programs that keep students engaged and safe.",
-    source: "National Education Association",
-  },
-  {
-    id: 4,
-    side: "against",
-    text: "Lacks clear accountability measures to ensure the funds are used effectively.",
-    source: "Government Accountability Office",
-  },
-];
+type Bill = {
+  id: string;
+  bill_number: string;
+  title: string;
+  arguments?: Argument[];
+};
 
-export const ArgumentCards = () => {
+type ArgumentCardsProps = {
+  bill: Bill | null;
+};
+
+export const ArgumentCards = ({ bill }: ArgumentCardsProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const currentArg = sampleArguments[currentIndex];
+  const [billArguments, setBillArguments] = useState<Argument[]>([]);
+
+  useEffect(() => {
+    if (bill?.arguments && Array.isArray(bill.arguments)) {
+      setBillArguments(bill.arguments);
+      setCurrentIndex(0);
+    }
+  }, [bill]);
+
+  if (!bill || billArguments.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            ⚖️ For vs. Against Arguments
+          </CardTitle>
+          <CardDescription>
+            Select a bill to see arguments from both sides
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
+
+  const currentArg = billArguments[currentIndex];
 
   const goNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % sampleArguments.length);
+    setCurrentIndex((prev) => (prev + 1) % billArguments.length);
   };
 
   const goPrevious = () => {
-    setCurrentIndex((prev) => (prev - 1 + sampleArguments.length) % sampleArguments.length);
+    setCurrentIndex((prev) => (prev - 1 + billArguments.length) % billArguments.length);
   };
 
   return (
@@ -108,7 +115,7 @@ export const ArgumentCards = () => {
           </Button>
 
           <div className="text-sm text-muted-foreground">
-            {currentIndex + 1} / {sampleArguments.length}
+            {currentIndex + 1} / {billArguments.length}
           </div>
 
           <Button variant="outline" onClick={goNext} size="sm">

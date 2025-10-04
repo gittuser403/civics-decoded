@@ -30,7 +30,9 @@ serve(async (req) => {
 
     const levelDescription = readingLevel === 'middle' 
       ? 'middle school (ages 11-14)' 
-      : 'high school (ages 14-18)';
+      : readingLevel === 'high'
+      ? 'high school (ages 14-18)'
+      : 'college level (ages 18+)';
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',

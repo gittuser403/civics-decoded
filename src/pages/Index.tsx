@@ -5,6 +5,7 @@ import { ArgumentCards } from "@/components/ArgumentCards";
 import { BillTracker } from "@/components/BillTracker";
 import { ContactRep } from "@/components/ContactRep";
 import { BillsList } from "@/components/BillsList";
+import { BillImpact } from "@/components/BillImpact";
 
 type Bill = {
   id: string;
@@ -55,12 +56,13 @@ const Index = () => {
               selectedBill={selectedBill} 
               onClearBill={() => setSelectedBill(null)}
             />
-            <ArgumentCards />
+            <ArgumentCards bill={selectedBill} />
           </div>
           
-          {/* Right Column - Tracker & Contact */}
+          {/* Right Column - Tracker, Impact & Contact */}
           <div className="lg:col-span-1 space-y-8">
-            <BillTracker />
+            <BillTracker bill={selectedBill} />
+            <BillImpact bill={selectedBill} />
             <ContactRep />
           </div>
         </div>

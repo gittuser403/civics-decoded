@@ -1,25 +1,51 @@
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, Circle, Clock } from "lucide-react";
 
 type BillStage = {
-  id: number;
   name: string;
   status: "completed" | "current" | "pending";
   date?: string;
 };
 
-const billStages: BillStage[] = [
-  { id: 1, name: "Introduced", status: "completed", date: "Jan 15, 2024" },
-  { id: 2, name: "Committee Review", status: "completed", date: "Feb 3, 2024" },
-  { id: 3, name: "House Vote", status: "current", date: "Expected Mar 2024" },
-  { id: 4, name: "Senate Vote", status: "pending" },
-  { id: 5, name: "Presidential Signature", status: "pending" },
-];
+type Bill = {
+  id: string;
+  bill_number: string;
+  title: string;
+  stages?: BillStage[];
+};
 
-export const BillTracker = () => {
-  const progress = (billStages.filter((s) => s.status === "completed").length / billStages.length) * 100;
+type BillTrackerProps = {
+  bill: Bill | null;
+};
+
+export const BillTracker = ({ bill }: BillTrackerProps) => {
+  const [stages, setStages] = useState<BillStage[]>([]);
+
+  useEffect(() => {
+    if (bill?.stages && Array.isArray(bill.stages)) {
+      setStages(bill.stages);
+    }
+  }, [bill]);
+
+  if (!bill || stages.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            📊 Bill Progress Tracker
+          </CardTitle>
+          <CardDescription>
+            Select a bill to track its journey through Congress
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
+
+  const progress = (stages.filter((s) => s.status === "completed").length / stages.length) * 100;
 
   return (
     <Card>
@@ -41,8 +67,8 @@ export const BillTracker = () => {
         </div>
 
         <div className="space-y-4">
-          {billStages.map((stage, index) => (
-            <div key={stage.id} className="flex items-start gap-4">
+          {stages.map((stage, index) => (
+            <div key={index} className="flex items-start gap-4">
               <div className="flex flex-col items-center">
                 {stage.status === "completed" ? (
                   <CheckCircle2 className="h-6 w-6 text-success" />
@@ -51,7 +77,7 @@ export const BillTracker = () => {
                 ) : (
                   <Circle className="h-6 w-6 text-muted-foreground" />
                 )}
-                {index < billStages.length - 1 && (
+                {index < stages.length - 1 && (
                   <div
                     className={`w-0.5 h-12 mt-1 ${
                       stage.status === "completed" ? "bg-success" : "bg-muted"

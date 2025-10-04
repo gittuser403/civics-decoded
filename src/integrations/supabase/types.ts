@@ -16,42 +16,86 @@ export type Database = {
     Tables: {
       bills: {
         Row: {
+          affected_population: string | null
+          arguments: Json | null
           bill_number: string
           category: string
+          cost_estimate: string | null
           created_at: string
           full_text: string
           id: string
+          impact_data: Json | null
           introduced_date: string
           short_description: string
           sponsor: string | null
+          stages: Json | null
           status: string
           title: string
         }
         Insert: {
+          affected_population?: string | null
+          arguments?: Json | null
           bill_number: string
           category: string
+          cost_estimate?: string | null
           created_at?: string
           full_text: string
           id?: string
+          impact_data?: Json | null
           introduced_date: string
           short_description: string
           sponsor?: string | null
+          stages?: Json | null
           status: string
           title: string
         }
         Update: {
+          affected_population?: string | null
+          arguments?: Json | null
           bill_number?: string
           category?: string
+          cost_estimate?: string | null
           created_at?: string
           full_text?: string
           id?: string
+          impact_data?: Json | null
           introduced_date?: string
           short_description?: string
           sponsor?: string | null
+          stages?: Json | null
           status?: string
           title?: string
         }
         Relationships: []
+      }
+      watchlist: {
+        Row: {
+          bill_id: string
+          created_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          bill_id: string
+          created_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          bill_id?: string
+          created_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "watchlist_bill_id_fkey"
+            columns: ["bill_id"]
+            isOneToOne: false
+            referencedRelation: "bills"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Loader2, GraduationCap, BookOpen, X } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sparkles, Loader2, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import ReactMarkdown from "react-markdown";
 
-type ReadingLevel = "middle" | "high";
+type ReadingLevel = "middle" | "high" | "college";
 
 type Bill = {
   id: string;
@@ -33,8 +35,16 @@ export const BillSummarizer = ({ selectedBill, onClearBill }: BillSummarizerProp
   const [readingLevel, setReadingLevel] = useState<ReadingLevel>("middle");
   const { toast } = useToast();
 
-  const handleSummarize = async () => {
-    const textToSummarize = selectedBill ? selectedBill.full_text : billText;
+  useEffect(() => {
+    if (selectedBill) {
+      handleSummarize(selectedBill.full_text);
+    } else {
+      setSummary("");
+    }
+  }, [selectedBill, readingLevel]);
+
+  const handleSummarize = async (textOverride?: string) => {
+    const textToSummarize = textOverride || selectedBill?.full_text || billText;
     
     if (!textToSummarize.trim()) {
       toast({
@@ -76,36 +86,34 @@ export const BillSummarizer = ({ selectedBill, onClearBill }: BillSummarizerProp
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" />
-          Bill Summarizer
+          AI Bill Summarizer
         </CardTitle>
         <CardDescription>
-          {selectedBill ? "Generate a summary for the selected bill" : "Paste a bill link or text to get a plain English summary"}
+          {selectedBill ? "Plain-English summary of the selected bill" : "Paste a bill's text to get a plain-English summary"}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex gap-2">
-          <Button
-            variant={readingLevel === "middle" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setReadingLevel("middle")}
-            className="flex-1"
-          >
-            <GraduationCap className="mr-2 h-4 w-4" />
-            Middle School
-          </Button>
-          <Button
-            variant={readingLevel === "high" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setReadingLevel("high")}
-            className="flex-1"
-          >
-            <BookOpen className="mr-2 h-4 w-4" />
-            High School
-          </Button>
+        <div className="flex gap-4">
+          <div className="flex-1">
+            <label className="text-sm font-medium mb-2 block">Reading Level</label>
+            <Select 
+              value={readingLevel} 
+              onValueChange={(value: ReadingLevel) => setReadingLevel(value)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="middle">🎓 Middle School</SelectItem>
+                <SelectItem value="high">📚 High School</SelectItem>
+                <SelectItem value="college">🎯 College</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {selectedBill ? (
-          <div className="rounded-lg border bg-primary-light p-4">
+          <div className="rounded-lg border bg-primary-light/20 p-4">
             <div className="flex items-start justify-between mb-2">
               <div>
                 <Badge variant="outline" className="mb-2">{selectedBill.bill_number}</Badge>
@@ -115,7 +123,10 @@ export const BillSummarizer = ({ selectedBill, onClearBill }: BillSummarizerProp
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={onClearBill}
+                  onClick={() => {
+                    onClearBill();
+                    setSummary("");
+                  }}
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -124,41 +135,46 @@ export const BillSummarizer = ({ selectedBill, onClearBill }: BillSummarizerProp
             <p className="text-sm text-muted-foreground">{selectedBill.short_description}</p>
           </div>
         ) : (
-          <Textarea
-            placeholder="Paste bill text or link here... (e.g., congress.gov/bill/...)"
-            value={billText}
-            onChange={(e) => setBillText(e.target.value)}
-            className="min-h-[120px]"
-          />
+          <>
+            <Textarea
+              placeholder="Paste bill text here..."
+              value={billText}
+              onChange={(e) => setBillText(e.target.value)}
+              className="min-h-[120px] font-mono text-sm"
+            />
+            <Button 
+              onClick={() => handleSummarize()} 
+              disabled={loading || !billText.trim()}
+              className="w-full"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Summarize Bill
+                </>
+              )}
+            </Button>
+          </>
         )}
-
-        <Button 
-          onClick={handleSummarize} 
-          disabled={loading}
-          className="w-full"
-        >
-          {loading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Analyzing...
-            </>
-          ) : (
-            <>
-              <Sparkles className="mr-2 h-4 w-4" />
-              Summarize Bill
-            </>
-          )}
-        </Button>
 
         {summary && (
           <div className="mt-4 rounded-lg border bg-secondary/50 p-4">
             <div className="flex items-center justify-between mb-3">
               <Badge variant="outline">
-                {readingLevel === "middle" ? "📚 Middle School Level" : "📖 High School Level"}
+                {readingLevel === "middle" 
+                  ? "🎓 Middle School Level" 
+                  : readingLevel === "high" 
+                  ? "📚 High School Level" 
+                  : "🎯 College Level"}
               </Badge>
             </div>
-            <div className="prose prose-sm max-w-none whitespace-pre-wrap text-foreground">
-              {summary}
+            <div className="prose prose-sm max-w-none text-foreground">
+              <ReactMarkdown>{summary}</ReactMarkdown>
             </div>
           </div>
         )}
