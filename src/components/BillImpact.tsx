@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,11 @@ export const BillImpact = ({ bill }: BillImpactProps) => {
   const [analyzing, setAnalyzing] = useState(false);
   const [impactData, setImpactData] = useState(bill?.impact_data);
   const { toast } = useToast();
+
+  // Update impact data when bill changes
+  useEffect(() => {
+    setImpactData(bill?.impact_data);
+  }, [bill]);
 
   const handleAnalyzeImpact = async () => {
     if (!bill) return;
