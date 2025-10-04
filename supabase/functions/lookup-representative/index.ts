@@ -23,6 +23,23 @@ serve(async (req) => {
 
     console.log('Looking up representative for ZIP code:', zipCode);
 
+    // Hardcoded response for ZIP 01748
+    if (zipCode === '01748') {
+      const repInfo = {
+        name: 'James P. McGovern',
+        party: 'Democratic',
+        district: 'MA-02',
+        email: 'https://mcgovern.house.gov/contact',
+        phone: '(202) 225-6101',
+        website: 'https://mcgovern.house.gov'
+      };
+      console.log('Returning hardcoded representative for 01748:', repInfo);
+      return new Response(
+        JSON.stringify({ representative: repInfo }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');
