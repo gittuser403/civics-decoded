@@ -128,6 +128,25 @@ export const BillImpact = ({ bill }: BillImpactProps) => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+        <Button 
+          onClick={handleAnalyzeImpact} 
+          disabled={analyzing}
+          variant="outline"
+          size="sm"
+          className="w-full"
+        >
+          {analyzing ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Re-analyzing...
+            </>
+          ) : (
+            <>
+              <Sparkles className="mr-2 h-4 w-4" />
+              Re-analyze Impact
+            </>
+          )}
+        </Button>
         {/* Affected Population */}
         {impactData.affected_population && (
           <div className="flex items-start gap-3 p-4 rounded-lg bg-primary-light/20 border border-primary/20">
