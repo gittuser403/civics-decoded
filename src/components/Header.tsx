@@ -1,9 +1,21 @@
-import { Scale, Plus, Lightbulb } from "lucide-react";
+import { Scale, Plus, Lightbulb, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 export const Header = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast({
+      title: "Logged out",
+      description: "You've been successfully logged out.",
+    });
+    navigate("/");
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70 shadow-sm">
@@ -39,6 +51,15 @@ export const Header = () => {
           >
             <Plus className="mr-2 h-5 w-5" />
             Submit Bill
+          </Button>
+          <Button 
+            onClick={handleLogout} 
+            size="lg" 
+            variant="outline"
+            className="rounded-xl font-heading font-semibold border-2 hover:border-destructive/50 transition-all duration-300"
+          >
+            <LogOut className="mr-2 h-5 w-5" />
+            Log Out
           </Button>
         </div>
       </div>
