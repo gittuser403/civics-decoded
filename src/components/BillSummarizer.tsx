@@ -104,9 +104,9 @@ export const BillSummarizer = ({ selectedBill, onClearBill }: BillSummarizerProp
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="middle">🎓 Middle School</SelectItem>
-                <SelectItem value="high">📚 High School</SelectItem>
-                <SelectItem value="college">🎯 College</SelectItem>
+                <SelectItem value="middle">Middle School</SelectItem>
+                <SelectItem value="high">High School</SelectItem>
+                <SelectItem value="college">College</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -167,10 +167,10 @@ export const BillSummarizer = ({ selectedBill, onClearBill }: BillSummarizerProp
             <div className="flex items-center justify-between mb-3">
               <Badge variant="outline">
                 {readingLevel === "middle" 
-                  ? "🎓 Middle School Level" 
+                  ? "Middle School Level" 
                   : readingLevel === "high" 
-                  ? "📚 High School Level" 
-                  : "🎯 College Level"}
+                  ? "High School Level" 
+                  : "College Level"}
               </Badge>
             </div>
             <div className="prose prose-sm max-w-none text-foreground">

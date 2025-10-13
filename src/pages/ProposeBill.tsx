@@ -364,8 +364,8 @@ const ProposeBill = () => {
                   <Card className="bg-secondary/50">
                     <CardContent className="pt-6">
                       <div className="flex items-start gap-4 mb-4">
-                        <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center text-2xl">
-                          👤
+                        <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold text-primary">
+                          {representative.name.charAt(0)}
                         </div>
                         <div className="flex-1">
                           <h4 className="font-semibold text-lg">{representative.name}</h4>

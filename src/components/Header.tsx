@@ -17,7 +17,7 @@ export const Header = () => {
               Policy in Plain English
             </h1>
             <p className="text-sm text-muted-foreground font-medium">
-              Understand legislation, simply ✨
+              Understand legislation, simply
             </p>
           </div>
         </div>

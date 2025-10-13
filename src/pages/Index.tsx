@@ -31,7 +31,7 @@ const Index = () => {
         <div className="mb-16 text-center animate-fade-in">
           <div className="inline-flex items-center gap-2 rounded-full bg-gradient-primary px-5 py-2 mb-6 shadow-card animate-float">
             <span className="text-sm font-heading font-semibold text-white">
-              ✨ Making legislation accessible to everyone
+              Making legislation accessible to everyone
             </span>
           </div>
           <h2 className="text-5xl md:text-6xl lg:text-7xl font-heading font-extrabold mb-6 bg-gradient-hero bg-clip-text text-transparent leading-tight">
@@ -39,7 +39,7 @@ const Index = () => {
           </h2>
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto font-medium leading-relaxed">
             Transform confusing legal language into clear, simple explanations. 
-            Perfect for students, educators, and engaged citizens. 🎓
+            Perfect for students, educators, and engaged citizens.
           </p>
         </div>
 
@@ -82,7 +82,7 @@ const Index = () => {
         {/* Info Banner */}
         <div className="mt-16 rounded-3xl bg-gradient-primary p-8 text-center shadow-elevated animate-scale-in">
           <h3 className="text-2xl font-heading font-bold mb-3 text-white">
-            🎓 Built for Students & Citizens
+            Built for Students & Citizens
           </h3>
           <p className="text-white/90 max-w-2xl mx-auto text-lg font-medium">
             Our mission is to make government more transparent and accessible. 

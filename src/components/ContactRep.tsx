@@ -61,7 +61,7 @@ export const ContactRep = () => {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          📞 Contact Your Representative
+          Contact Your Representative
         </CardTitle>
         <CardDescription>
           Find and reach out to your elected officials
@@ -91,8 +91,8 @@ export const ContactRep = () => {
         {representative && (
           <div className="mt-6 space-y-4 rounded-lg border bg-secondary/50 p-4">
             <div className="flex items-start gap-4">
-              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center text-2xl">
-                👤
+              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold text-primary">
+                {representative.name.charAt(0)}
               </div>
               <div className="flex-1">
                 <h4 className="font-semibold text-lg">{representative.name}</h4>
