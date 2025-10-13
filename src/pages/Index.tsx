@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Header } from "@/components/Header";
 import { BillSummarizer } from "@/components/BillSummarizer";
 import { ArgumentCards } from "@/components/ArgumentCards";
-import { BillTracker } from "@/components/BillTracker";
 import { ContactRep } from "@/components/ContactRep";
 import { BillsList } from "@/components/BillsList";
 import { BillImpact } from "@/components/BillImpact";
@@ -83,11 +82,8 @@ const Index = () => {
             </Tabs>
           </div>
           
-          {/* Right Column - Tracker, Impact & Contact */}
+          {/* Right Column - Impact & Contact */}
           <div className="lg:col-span-1 space-y-8">
-            <div className="rounded-2xl overflow-hidden shadow-card hover:shadow-elevated transition-all duration-300">
-              <BillTracker bill={selectedBill} />
-            </div>
             <div className="rounded-2xl overflow-hidden shadow-card hover:shadow-elevated transition-all duration-300">
               <BillImpact bill={selectedBill} />
             </div>
