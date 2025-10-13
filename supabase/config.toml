@@ -26,3 +26,6 @@ verify_jwt = false
 
 [functions.analyze-bill-impact]
 verify_jwt = false
+
+[functions.bill-buddy-chat]
+verify_jwt = false

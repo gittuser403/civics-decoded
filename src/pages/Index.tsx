@@ -6,6 +6,8 @@ import { BillTracker } from "@/components/BillTracker";
 import { ContactRep } from "@/components/ContactRep";
 import { BillsList } from "@/components/BillsList";
 import { BillImpact } from "@/components/BillImpact";
+import { BillBuddy } from "@/components/BillBuddy";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type Bill = {
   id: string;
@@ -52,17 +54,33 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Middle Column - Summarizer & Arguments */}
-          <div className="lg:col-span-1 space-y-8">
-            <div className="rounded-2xl overflow-hidden shadow-card hover:shadow-elevated transition-all duration-300">
-              <BillSummarizer 
-                selectedBill={selectedBill} 
-                onClearBill={() => setSelectedBill(null)}
-              />
-            </div>
-            <div className="rounded-2xl overflow-hidden shadow-card hover:shadow-elevated transition-all duration-300">
-              <ArgumentCards bill={selectedBill} />
-            </div>
+          {/* Middle Column - Tabs with Bill Analysis */}
+          <div className="lg:col-span-1">
+            <Tabs defaultValue="summarizer" className="w-full">
+              <TabsList className="w-full grid grid-cols-3">
+                <TabsTrigger value="summarizer">Summary</TabsTrigger>
+                <TabsTrigger value="arguments">Arguments</TabsTrigger>
+                <TabsTrigger value="buddy">Bill Buddy</TabsTrigger>
+              </TabsList>
+              <TabsContent value="summarizer" className="mt-4">
+                <div className="rounded-2xl overflow-hidden shadow-card hover:shadow-elevated transition-all duration-300">
+                  <BillSummarizer 
+                    selectedBill={selectedBill} 
+                    onClearBill={() => setSelectedBill(null)}
+                  />
+                </div>
+              </TabsContent>
+              <TabsContent value="arguments" className="mt-4">
+                <div className="rounded-2xl overflow-hidden shadow-card hover:shadow-elevated transition-all duration-300">
+                  <ArgumentCards bill={selectedBill} />
+                </div>
+              </TabsContent>
+              <TabsContent value="buddy" className="mt-4">
+                <div className="rounded-2xl overflow-hidden shadow-card hover:shadow-elevated transition-all duration-300">
+                  <BillBuddy selectedBill={selectedBill} />
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
           
           {/* Right Column - Tracker, Impact & Contact */}
