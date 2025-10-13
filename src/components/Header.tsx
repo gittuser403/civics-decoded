@@ -1,4 +1,4 @@
-import { Scale, Plus } from "lucide-react";
+import { Scale, Plus, Lightbulb } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -18,10 +18,16 @@ export const Header = () => {
           </div>
         </div>
         
-        <Button onClick={() => navigate("/submit-bill")} size="sm">
-          <Plus className="mr-2 h-4 w-4" />
-          Submit Bill
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => navigate("/propose-bill")} size="sm" variant="default">
+            <Lightbulb className="mr-2 h-4 w-4" />
+            Propose Bill
+          </Button>
+          <Button onClick={() => navigate("/submit-bill")} size="sm" variant="outline">
+            <Plus className="mr-2 h-4 w-4" />
+            Submit Bill
+          </Button>
+        </div>
       </div>
     </header>
   );
