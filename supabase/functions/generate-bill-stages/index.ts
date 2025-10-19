@@ -17,12 +17,17 @@ serve(async (req) => {
     console.log('Generating stages for bill:', billTitle);
 
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
-    if (!lovableApiKey) {
-      throw new Error('LOVABLE_API_KEY not configured');
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    
+    if (!lovableApiKey || !supabaseUrl || !supabaseKey) {
+      console.error('[generate-bill-stages] Missing required configuration');
+      return new Response(
+        JSON.stringify({ error: 'Service temporarily unavailable' }),
+        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
-
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Generate stages using Lovable AI
@@ -85,8 +90,11 @@ Include typical congressional stages like: Introduced, Committee Review, House V
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Lovable AI error:', response.status, errorText);
-      throw new Error(`AI request failed: ${response.status}`);
+      console.error('[generate-bill-stages] AI gateway error:', response.status, errorText);
+      return new Response(
+        JSON.stringify({ error: 'Unable to generate bill stages' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const data = await response.json();
@@ -114,10 +122,13 @@ Include typical congressional stages like: Introduced, Committee Review, House V
     );
 
   } catch (error) {
-    console.error('Error in generate-bill-stages:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('[generate-bill-stages] Function error:', {
+      error: error instanceof Error ? error.message : 'Unknown',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+    });
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: 'An error occurred generating stages' }),
       { 
         status: 500, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 

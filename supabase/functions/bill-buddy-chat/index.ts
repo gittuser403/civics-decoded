@@ -23,7 +23,11 @@ serve(async (req) => {
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY is not configured');
+      console.error('[bill-buddy-chat] Missing LOVABLE_API_KEY configuration');
+      return new Response(
+        JSON.stringify({ error: 'Service temporarily unavailable' }),
+        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Build system prompt with bill context if available
@@ -71,9 +75,9 @@ Use this context to answer questions about this specific bill.`;
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('AI gateway error:', response.status, errorText);
+      console.error('[bill-buddy-chat] AI gateway error:', response.status, errorText);
       return new Response(
-        JSON.stringify({ error: 'Failed to generate response' }),
+        JSON.stringify({ error: 'Unable to process request' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -93,9 +97,13 @@ Use this context to answer questions about this specific bill.`;
     );
 
   } catch (error) {
-    console.error('Error in bill-buddy-chat function:', error);
+    console.error('[bill-buddy-chat] Function error:', {
+      error: error instanceof Error ? error.message : 'Unknown',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+    });
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Internal server error' }),
+      JSON.stringify({ error: 'An error occurred processing your request' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

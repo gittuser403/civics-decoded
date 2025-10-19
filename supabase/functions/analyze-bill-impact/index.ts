@@ -17,12 +17,17 @@ serve(async (req) => {
     console.log('Analyzing impact for bill:', billTitle);
 
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
-    if (!lovableApiKey) {
-      throw new Error('LOVABLE_API_KEY not configured');
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    
+    if (!lovableApiKey || !supabaseUrl || !supabaseKey) {
+      console.error('[analyze-bill-impact] Missing required configuration');
+      return new Response(
+        JSON.stringify({ error: 'Service temporarily unavailable' }),
+        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
-
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Analyze impact using Lovable AI
@@ -82,8 +87,11 @@ Provide analysis including:
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Lovable AI error:', response.status, errorText);
-      throw new Error(`AI request failed: ${response.status}`);
+      console.error('[analyze-bill-impact] AI gateway error:', response.status, errorText);
+      return new Response(
+        JSON.stringify({ error: 'Unable to analyze bill impact' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const data = await response.json();
@@ -111,10 +119,13 @@ Provide analysis including:
     );
 
   } catch (error) {
-    console.error('Error in analyze-bill-impact:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('[analyze-bill-impact] Function error:', {
+      error: error instanceof Error ? error.message : 'Unknown',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+    });
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: 'An error occurred analyzing impact' }),
       { 
         status: 500, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
