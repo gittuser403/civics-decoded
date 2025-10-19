@@ -153,7 +153,15 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      sync_status: {
+        Row: {
+          last_sync_time: string | null
+          source: string | null
+          successful_syncs: number | null
+          total_syncs: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
