@@ -50,6 +50,18 @@ export const BillBuddy = ({ selectedBill }: BillBuddyProps) => {
     setIsLoading(true);
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        toast({
+          title: "Authentication required",
+          description: "Please log in to use Bill Buddy",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke("bill-buddy-chat", {
         body: {
           messages: [...messages, userMessage],
@@ -61,6 +73,9 @@ export const BillBuddy = ({ selectedBill }: BillBuddyProps) => {
             status: selectedBill.status,
             category: selectedBill.category,
           } : null,
+        },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
         },
       });
 

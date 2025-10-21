@@ -39,6 +39,18 @@ export const BillImpact = ({ bill }: BillImpactProps) => {
     });
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        toast({
+          title: "Authentication required",
+          description: "Please log in to analyze bill impact",
+          variant: "destructive",
+        });
+        setAnalyzing(false);
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke('analyze-bill-impact', {
         body: {
           billId: bill.id,
@@ -46,6 +58,9 @@ export const BillImpact = ({ bill }: BillImpactProps) => {
           billNumber: bill.bill_number,
           shortDescription: bill.short_description,
           fullText: bill.full_text,
+        },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
         },
       });
 

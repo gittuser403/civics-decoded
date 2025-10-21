@@ -1,10 +1,15 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+const RequestSchema = z.object({
+  zipCode: z.string().regex(/^\d{5}$/, 'Valid 5-digit ZIP code is required')
+});
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -12,14 +17,17 @@ serve(async (req) => {
   }
 
   try {
-    const { zipCode } = await req.json();
-
-    if (!zipCode || zipCode.length !== 5) {
+    const body = await req.json();
+    
+    const parseResult = RequestSchema.safeParse(body);
+    if (!parseResult.success) {
       return new Response(
-        JSON.stringify({ error: 'Invalid ZIP code. Please provide a 5-digit ZIP code.' }),
+        JSON.stringify({ error: 'Invalid input parameters' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    const { zipCode } = parseResult.data;
 
     console.log('Looking up representative for ZIP code:', zipCode);
 

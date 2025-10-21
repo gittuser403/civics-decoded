@@ -96,7 +96,23 @@ export const BillsList = ({ onSelectBill }: BillsListProps) => {
     });
 
     try {
-      const { data, error } = await supabase.functions.invoke('sync-legislative-data');
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        toast({
+          title: "Authentication required",
+          description: "Please log in to sync legislation",
+          variant: "destructive",
+        });
+        setSyncing(false);
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('sync-legislative-data', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
 
       if (error) throw error;
 

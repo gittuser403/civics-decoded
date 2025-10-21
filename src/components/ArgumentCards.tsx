@@ -44,11 +44,26 @@ export const ArgumentCards = ({ bill }: ArgumentCardsProps) => {
 
     setLoading(true);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        toast({
+          title: "Authentication required",
+          description: "Please log in to generate arguments",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke('generate-arguments', {
         body: { 
           billText: bill.full_text,
           billTitle: bill.title 
-        }
+        },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
       });
 
       if (error) throw error;

@@ -1,10 +1,16 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+const RequestSchema = z.object({
+  billText: z.string().min(1).max(100000),
+  billTitle: z.string().min(1).max(500)
+});
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -12,14 +18,17 @@ serve(async (req) => {
   }
 
   try {
-    const { billText, billTitle } = await req.json();
-
-    if (!billText || !billTitle) {
+    const body = await req.json();
+    
+    const parseResult = RequestSchema.safeParse(body);
+    if (!parseResult.success) {
       return new Response(
-        JSON.stringify({ error: 'Missing billText or billTitle' }),
+        JSON.stringify({ error: 'Invalid input parameters' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    const { billText, billTitle } = parseResult.data;
 
     console.log('Generating arguments for bill:', billTitle);
 

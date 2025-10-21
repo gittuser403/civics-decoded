@@ -1,10 +1,30 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+const MessageSchema = z.object({
+  role: z.enum(['user', 'assistant']),
+  content: z.string().min(1).max(2000)
+});
+
+const BillContextSchema = z.object({
+  billNumber: z.string().max(50),
+  title: z.string().max(500),
+  description: z.string().max(1000),
+  fullText: z.string().max(50000),
+  status: z.string().max(100),
+  category: z.string().max(100)
+}).optional();
+
+const RequestSchema = z.object({
+  messages: z.array(MessageSchema).min(1).max(50),
+  billContext: BillContextSchema
+});
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -12,14 +32,17 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, billContext } = await req.json();
-
-    if (!messages || !Array.isArray(messages)) {
+    const body = await req.json();
+    
+    const parseResult = RequestSchema.safeParse(body);
+    if (!parseResult.success) {
       return new Response(
-        JSON.stringify({ error: 'Messages array is required' }),
+        JSON.stringify({ error: 'Invalid input parameters' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    const { messages, billContext } = parseResult.data;
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
