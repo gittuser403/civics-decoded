@@ -53,9 +53,9 @@ const Landing = () => {
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-24 text-center animate-fade-in">
-        <div className="inline-flex items-center gap-2 rounded-full bg-gradient-primary px-4 sm:px-5 py-1.5 sm:py-2 mb-4 sm:mb-6 shadow-card animate-float">
-          <span className="text-xs sm:text-sm font-heading font-semibold text-white">
-            Making legislation accessible to everyone
+        <div className="inline-flex items-center gap-2 rounded-full bg-gradient-primary px-5 sm:px-6 py-2 sm:py-2.5 mb-4 sm:mb-6 shadow-elevated animate-float hover:shadow-glow transition-all duration-500 cursor-default">
+          <span className="text-xs sm:text-sm font-heading font-bold text-white tracking-wide">
+            ✨ Making legislation accessible to everyone
           </span>
         </div>
         <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-heading font-extrabold mb-4 sm:mb-6 bg-gradient-hero bg-clip-text text-transparent leading-tight max-w-5xl mx-auto px-4">
@@ -66,8 +66,9 @@ const Landing = () => {
           Perfect for students, educators, and engaged citizens.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4">
-          <Button size="lg" className="text-base sm:text-lg w-full sm:w-auto" onClick={() => navigate("/auth?mode=signup")}>
-            Get Started Free <ArrowRight className="ml-2 h-4 sm:h-5 w-4 sm:w-5" />
+          <Button size="lg" className="text-base sm:text-lg w-full sm:w-auto group" onClick={() => navigate("/auth?mode=signup")}>
+            Get Started Free 
+            <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
           </Button>
           <Button size="lg" variant="outline" className="text-base sm:text-lg w-full sm:w-auto" onClick={() => navigate("/auth?mode=login")}>
             Sign In
@@ -81,32 +82,32 @@ const Landing = () => {
           Powerful Features for Understanding Legislation
         </h3>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
-          <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-card hover:shadow-elevated transition-all duration-300">
-            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-primary flex items-center justify-center mb-3 sm:mb-4">
-              <BookOpen className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+          <div className="group rounded-3xl border-2 border-border bg-card p-6 sm:p-8 shadow-card hover:shadow-elevated hover:border-primary/30 transition-all duration-500 hover:-translate-y-1 cursor-pointer">
+            <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-gradient-primary flex items-center justify-center mb-4 sm:mb-5 group-hover:scale-110 transition-transform duration-500 shadow-glow">
+              <BookOpen className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
             </div>
-            <h4 className="text-lg sm:text-xl font-heading font-bold mb-2 sm:mb-3">AI-Powered Summaries</h4>
-            <p className="text-sm sm:text-base text-muted-foreground">
+            <h4 className="text-lg sm:text-xl font-heading font-bold mb-2 sm:mb-3 group-hover:text-primary transition-colors duration-300">AI-Powered Summaries</h4>
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
               Get instant, easy-to-understand summaries of complex congressional bills in plain English.
             </p>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-card hover:shadow-elevated transition-all duration-300">
-            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-primary flex items-center justify-center mb-3 sm:mb-4">
-              <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+          <div className="group rounded-3xl border-2 border-border bg-card p-6 sm:p-8 shadow-card hover:shadow-elevated hover:border-primary/30 transition-all duration-500 hover:-translate-y-1 cursor-pointer">
+            <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-gradient-primary flex items-center justify-center mb-4 sm:mb-5 group-hover:scale-110 transition-transform duration-500 shadow-glow">
+              <MessageSquare className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
             </div>
-            <h4 className="text-lg sm:text-xl font-heading font-bold mb-2 sm:mb-3">Bill Buddy Chat</h4>
-            <p className="text-sm sm:text-base text-muted-foreground">
+            <h4 className="text-lg sm:text-xl font-heading font-bold mb-2 sm:mb-3 group-hover:text-primary transition-colors duration-300">Bill Buddy Chat</h4>
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
               Ask questions about any bill and get intelligent, conversational answers from our AI assistant.
             </p>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-card hover:shadow-elevated transition-all duration-300 sm:col-span-2 lg:col-span-1">
-            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-primary flex items-center justify-center mb-3 sm:mb-4">
-              <Users className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+          <div className="group rounded-3xl border-2 border-border bg-card p-6 sm:p-8 shadow-card hover:shadow-elevated hover:border-primary/30 transition-all duration-500 hover:-translate-y-1 cursor-pointer sm:col-span-2 lg:col-span-1">
+            <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-gradient-primary flex items-center justify-center mb-4 sm:mb-5 group-hover:scale-110 transition-transform duration-500 shadow-glow">
+              <Users className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
             </div>
-            <h4 className="text-lg sm:text-xl font-heading font-bold mb-2 sm:mb-3">Contact Representatives</h4>
-            <p className="text-sm sm:text-base text-muted-foreground">
+            <h4 className="text-lg sm:text-xl font-heading font-bold mb-2 sm:mb-3 group-hover:text-primary transition-colors duration-300">Contact Representatives</h4>
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
               Easily reach out to your elected officials and make your voice heard on issues that matter.
             </p>
           </div>
